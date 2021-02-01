@@ -7,7 +7,7 @@ namespace EtsyAccess.Services.Authentication
 {
 	public interface IEtsyAuthenticationService
 	{
-		Task< OAuthCredentials > GetTemporaryCredentials( string[] scopes );
+		Task< OAuthCredentials > GetTemporaryCredentials( string[] scopes, string oauthCallback = null );
 		Task< OAuthCredentials > GetPermanentCredentials( string temporaryToken, string temporaryTokenSecret, string verifierCode );
 	}
 }

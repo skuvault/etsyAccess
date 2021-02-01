@@ -106,8 +106,9 @@ namespace EtsyAccess.Services.Authentication
 		///	Returns temporary credentials and login url for customer
 		/// </summary>
 		/// <param name="scopes">Permissions</param>
+		/// <param name="oauthCallback">Optional redirection URI where Etsy will redirect the user to after a successful login</param>
 		/// <returns></returns>
-		public Task< OAuthCredentials > GetTemporaryCredentials( string[] scopes )
+		public Task< OAuthCredentials > GetTemporaryCredentials( string[] scopes, string oauthCallback = null )
 		{
 			Condition.Requires( scopes ).IsNotEmpty();
 
@@ -116,7 +117,7 @@ namespace EtsyAccess.Services.Authentication
 			var requestParameters = new Dictionary<string, string>
 			{
 				{ "scopes", string.Join(" ", scopes) },
-				{ "oauth_callback", "oob" }
+				{ "oauth_callback", oauthCallback ?? "oob" }
 			};
 
 			return Policy.HandleResult<OAuthCredentials>( credentials => credentials == null )
@@ -155,7 +156,8 @@ namespace EtsyAccess.Services.Authentication
 
 							string[] temp = loginUrl.Split( '?' );
 
-							if ( temp.Length == 2 )
+							// OAuthCallback might contain additional question marks
+							if ( temp.Length >= 2 )
 							{
 								var queryParams = Misc.ParseQueryParams( temp[1] );
 								queryParams.TryGetValue( "oauth_token", out var token );
